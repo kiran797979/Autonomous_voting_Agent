@@ -79,21 +79,30 @@ async function fetchProxiesFromApi() {
   try {
     logger.info(`🌐 Fetching fresh proxies from API...`);
     const response = await fetch(CONFIG.proxyApiUrl);
-    const data = await response.json();
+    const text = await response.text();
 
-    const proxies = [];
-    if (data && data.data && Array.isArray(data.data)) {
-      for (const proxy of data.data) {
-        if (proxy.ip && proxy.port) {
-          if (proxy.protocols && (proxy.protocols.includes('http') || proxy.protocols.includes('https'))) {
+    let proxies = [];
+
+    // Try to parse as JSON first (GeoNode format)
+    try {
+      const data = JSON.parse(text);
+      if (data && data.data && Array.isArray(data.data)) {
+        for (const proxy of data.data) {
+          if (proxy.ip && proxy.port) {
             proxies.push(`${proxy.ip}:${proxy.port}`);
           }
         }
       }
+    } catch {
+      // If not JSON, treat as plain text list (ProxyScrape format)
+      // Each line is ip:port
+      proxies = text.split('\n')
+        .map(line => line.trim())
+        .filter(line => line && line.includes(':'));
     }
 
     logger.info(`✅ Loaded ${proxies.length} proxies from API`);
-    return proxies;
+    return proxies.slice(0, 100); // Limit to first 100 for efficiency
   } catch (error) {
     logger.error(`❌ Failed to fetch proxies from API: ${error.message}`);
     return [];

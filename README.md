@@ -11,22 +11,25 @@ A powerful, stealth-enabled autonomous voting bot built with Puppeteer and Node.
 ### Core Features
 - **Autonomous Operation** - Runs continuously until target votes reached
 - **Parallel Browser Execution** - Run 4+ browsers simultaneously for faster voting
-- **Smart Button Detection** - Multiple strategies to find vote buttons
-- **Progress Tracking** - Real-time vote count and ETA
+- **Smart Button Detection** - Multiple strategies to find and click vote buttons
+- **Progress Tracking** - Real-time vote count and cycle monitoring
+- **Debug Screenshots** - Captures before/after click screenshots for troubleshooting
 
 ### 🎭 Anti-Detection (Stealth Mode)
 - **Puppeteer Stealth Plugin** - Bypasses WebDriver detection
 - **Canvas Fingerprint Randomization** - Unique fingerprint per session
 - **Random User Agents** - Rotates between Chrome, Firefox, Safari
 - **Random Screen Resolutions** - 1366x768, 1920x1080, 2560x1440, etc.
-- **Timezone Spoofing** - Random timezones (NY, LA, London, Tokyo)
-- **Human-like Behavior** - Random delays, natural mouse movements
+- **Timezone Spoofing** - Random timezones (New York, LA, London, Tokyo, Sydney)
+- **Human-like Behavior** - Random delays, natural mouse movements, realistic typing
 - **Incognito Sessions** - Fresh cookies every time
 
-### 🌐 Network Features
-- **Proxy Rotation** - Different IP for each cycle
-- **Proxy API Integration** - Auto-fetch fresh proxies
-- **Fallback to Direct** - Uses your IP if proxies fail
+### 🌐 Proxy Support
+- **Proxy Rotation** - Different IP for each voting cycle
+- **ProxyScrape API Integration** - Auto-fetches fresh proxies (updated every second)
+- **Multi-format Support** - Works with JSON and plain-text proxy lists
+- **Auto-retry** - Tries next proxy if one fails
+- **Fallback** - Uses direct connection if proxies unavailable
 
 ## 📋 Requirements
 
@@ -73,56 +76,60 @@ Create a `.env` file based on `envExamples`:
 | `RELOAD_INTERVAL` | Wait between cycles (ms) | `240000` (4 min) |
 | `PARALLEL_BROWSERS` | Simultaneous browsers | `4` |
 | `HEADLESS` | Hide browser windows | `false` |
-| `USE_PROXY` | Enable proxy rotation | `false` |
+| `USE_PROXY` | Enable proxy rotation | `true` |
 | `PROXY_API_URL` | Proxy API endpoint | See envExamples |
 
-## 📊 How It Works
+## 🔄 How It Works
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    STEALTH VOTING CYCLE                      │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
-│  │Browser 1 │  │Browser 2 │  │Browser 3 │  │Browser 4 │    │
-│  │ User A   │  │ User B   │  │ User C   │  │ User D   │    │
-│  │ 🎭 Stealth│  │ 🎭 Stealth│  │ 🎭 Stealth│  │ 🎭 Stealth│    │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘    │
-│       │             │             │             │           │
-│       ▼             ▼             ▼             ▼           │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │              PARALLEL VOTE EXECUTION                  │  │
-│  │    • Random fingerprints    • Human-like delays      │  │
-│  │    • Different resolutions  • Natural mouse moves    │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                            │                                │
-│                            ▼                                │
-│                    ⏳ Wait 4 minutes                        │
-│                            │                                │
-│                            ▼                                │
-│                    🔄 Repeat Cycle                          │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                    STEALTH VOTING CYCLE                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. Fetch fresh proxies from ProxyScrape API                    │
+│  2. Launch 4 parallel stealth browsers                          │
+│  3. Each browser:                                                │
+│     • Uses different proxy/IP                                    │
+│     • Random screen resolution & timezone                        │
+│     • Randomized fingerprint                                     │
+│  4. Search for target user                                       │
+│  5. Find "Vote" button (excludes "Most votes", "Voted", etc.)   │
+│  6. Human-like mouse movement & click                            │
+│  7. Verify button changed to "Voted"                             │
+│  8. Wait 4 minutes (randomized)                                  │
+│  9. Repeat with new proxies                                      │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+## 📊 Vote Button Detection
+
+The agent uses multiple strategies to find the correct vote button:
+
+1. **Text Match** - Finds buttons with exactly "Vote" text
+2. **Exclusion Filter** - Ignores "Most votes", "Most recent", "Random", "Voted"
+3. **Size Filter** - Only clicks small buttons (< 100px width)
+4. **State Verification** - Confirms button changed from "Vote" to "Voted"
 
 ## 📁 Project Structure
 
 ```
 Autonomous_voting_Agent/
-├── voting-agent.js    # Main bot code
-├── package.json       # Dependencies
-├── .env              # Your config (create from envExamples)
-├── envExamples       # Example configuration
-├── README.md         # This file
-├── .gitignore        # Git ignore rules
-└── voting_agent.log  # Execution logs
+├── voting-agent.js      # Main bot code with stealth features
+├── package.json         # Dependencies (puppeteer-extra, stealth plugin)
+├── .env                 # Your config (create from envExamples)
+├── envExamples          # Example configuration template
+├── README.md            # Documentation
+├── .gitignore           # Excludes .env, logs, screenshots
+├── voting_agent.log     # Execution logs
+└── debug_*.png          # Debug screenshots (before/after clicks)
 ```
 
 ## 🔧 Advanced Usage
 
-### Run More Parallel Browsers
+### Increase Parallel Browsers
 ```bash
-# Edit .env
+# Edit .env - more browsers = faster (uses more RAM)
 PARALLEL_BROWSERS=8
 ```
 
@@ -130,27 +137,60 @@ PARALLEL_BROWSERS=8
 ```bash
 # Edit .env
 USE_PROXY=true
-PROXY_API_URL=https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc
+PROXY_API_URL=https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all
 ```
 
-### Run in Headless Mode (Background)
+### Run in Headless Mode
 ```bash
-# Edit .env
+# Edit .env - runs in background without browser windows
 HEADLESS=true
 ```
 
-## 📝 Logs
+### Use Custom Proxy List
+```bash
+# Edit .env
+PROXY_API_URL=
+PROXY_LIST=ip1:port1,ip2:port2,ip3:port3
+```
+
+## 📝 Logs & Debugging
 
 All activity is logged to `voting_agent.log` and console:
 
 ```
 [timestamp] INFO: 🔄 STEALTH CYCLE #1
 [timestamp] INFO: [W1] 🎭 Stealth browser ready (1920x1080, America/New_York)
+[timestamp] INFO: [W1] 🌐 Proxy: 123.45.67.89:8080...
 [timestamp] INFO: [W1] 🔍 Button BEFORE: "Vote"
+[timestamp] INFO: [W1] 🔍 Button AFTER: "Voted"
 [timestamp] INFO: [W1] ✅ VOTED for user1 (button changed!)
-[timestamp] INFO: 📊 Cycle 1: 4/4 votes
-[timestamp] INFO: 📈 Progress: ~4/300 (1%)
+[timestamp] INFO: 📊 Cycle 1: 2/4 votes
+[timestamp] INFO: 📈 Progress: ~2/300 (1%)
 ```
+
+### Debug Screenshots
+The agent saves screenshots for debugging:
+- `debug_before_click_W1.png` - Page before clicking vote
+- `debug_after_click_W1.png` - Page after clicking vote
+- `debug_no_button_W1.png` - When no vote button found
+
+## ⚠️ Known Limitations
+
+1. **Free Proxies** - Have ~25% success rate. Consider paid proxies for better results.
+2. **IP Tracking** - Most voting sites track votes by IP. Without working proxies, you can only vote once per user.
+3. **Rate Limits** - 4-minute wait between cycles to avoid detection.
+
+## 🛡️ Anti-Detection Features
+
+| Detection Method | Bypass Technique |
+|-----------------|------------------|
+| WebDriver Detection | puppeteer-extra-plugin-stealth |
+| Canvas Fingerprinting | Randomized canvas pixels |
+| Browser Fingerprint | Random resolution, timezone, language |
+| Cookie/Session Tracking | Incognito mode (fresh session) |
+| Bot-like Behavior | Human-like mouse & typing delays |
+| Rate Limiting | Randomized wait times (±30 sec) |
+| IP Tracking | Proxy rotation per cycle |
 
 ## ⚠️ Disclaimer
 
