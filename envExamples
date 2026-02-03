@@ -1,0 +1,39 @@
+# v0 Voting Agent Configuration Example
+# Copy this file to .env and update with your values
+
+# Website URL to vote on
+WEBSITE_URL=https://your-voting-website.com/browse
+
+# Comma-separated list of usernames to vote for
+USERS_TO_VOTE=user1,user2,user3,user4
+
+# Target number of votes to reach before stopping
+TARGET_VOTES=300
+
+# Wait time between voting cycles (in milliseconds)
+# 240000 = 4 minutes
+RELOAD_INTERVAL=240000
+
+# Log file name
+LOG_FILE=voting_agent.log
+
+# Set to true for headless mode (no visible browser)
+# Set to false to see the browser in action
+HEADLESS=false
+
+# ⚡ TURBO MODE - Number of parallel browser instances
+# More browsers = faster voting (uses more RAM)
+# Recommended: 2-4 for normal PCs, 6-8 for powerful machines
+PARALLEL_BROWSERS=4
+
+# Proxy Settings for IP Rotation
+# Set to true to enable proxy rotation
+USE_PROXY=false
+
+# Proxy API URL (fetches fresh proxies automatically)
+# Leave empty to use PROXY_LIST instead
+PROXY_API_URL=https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc
+
+# Manual proxy list (comma-separated, format: ip:port)
+# Only used if PROXY_API_URL is empty
+PROXY_LIST=

@@ -1,0 +1,25 @@
+{
+  "name": "v0-voting-agent",
+  "version": "1.0.0",
+  "description": "Autonomous AI agent for v0 voting automation",
+  "main": "voting-agent.js",
+  "scripts": {
+    "start": "node voting-agent.js",
+    "test": "node voting-agent.js"
+  },
+  "keywords": [
+    "automation",
+    "voting",
+    "puppeteer",
+    "ai-agent"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.1",
+    "puppeteer": "^21.11.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "winston": "^3.11.0"
+  }
+}
